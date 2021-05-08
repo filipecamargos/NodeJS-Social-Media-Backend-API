@@ -20,16 +20,18 @@ exports.getPosts = (req, res, next) => {
   });
 };
 
-//Creat a post
+/*********************************************************
+ * POST METHOD => create a new social media post on the DB
+ * ********************************************************/
 exports.createPost = (req, res, next) => {
-  
+
   //Check validation of the post
   const errors = validationResult(req);
   if (!errors.isEmpty) {
-    return res.status(422).json({
-      message: "Invalid Post Method. Inconsistent Data!",
-      errors: errors.array(),
-    });
+    //Custom error message
+    const error = new Error("Invalid Post Method. Inconsistent Data!")
+    error.statusCode = 422;
+    throw error;
   }
 
   //receive the values passed in the body
@@ -52,6 +54,10 @@ exports.createPost = (req, res, next) => {
       post: result
     });
   }).catch( err => {
-    console.log(err);
+    //throw an error in case it occur in the DB
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
   })
 };
