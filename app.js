@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const path = require('path');
 
 //Import the config file
 const CONFIG = require("./private");
@@ -9,8 +10,9 @@ const feedRoutes = require("./routes/feed");
 
 const app = express();
 
-// app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
-app.use(bodyParser.json()); // application/json
+app.use(bodyParser.json());
+//Construct an absolut path to the image folder
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
