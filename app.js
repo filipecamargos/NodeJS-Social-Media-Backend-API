@@ -1,7 +1,11 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
-const feedRoutes = require('./routes/feed');
+//Import the config file
+const CONFIG = require("./private");
+
+const feedRoutes = require("./routes/feed");
 
 const app = express();
 
@@ -9,12 +13,23 @@ const app = express();
 app.use(bodyParser.json()); // application/json
 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "OPTIONS, GET, POST, PUT, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
 });
 
-app.use('/feed', feedRoutes);
+app.use("/feed", feedRoutes);
 
-app.listen(8080);
+//Set the connection
+mongoose
+  .connect(CONFIG.db)
+  .then((result) => {
+    app.listen(8080);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
