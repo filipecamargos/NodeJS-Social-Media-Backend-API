@@ -6,20 +6,15 @@ const Post = require("../models/post");
  * GET the feed's posts => Get all the post for the news feed
  * ********************************************************/
 exports.getPosts = (req, res, next) => {
-  res.status(200).json({
-    posts: [
-      {
-        _id: "152",
-        title: "First Post",
-        content: "This is the first post!",
-        imageUrl: "image/questions.JPG",
-        creator: {
-          name: "John Dough",
-        },
-        date: new Date(),
-      },
-    ],
-  });
+  //fetch the feed post from the db
+  Post.find()
+  .then(feedPosts => {
+    res.status(200).json({
+      message: (feedPosts.length < 1)  ? 'There are no posts!' : 'Feed Posts Returned.',
+      posts: feedPosts,
+    })
+  })
+  .catch();
 };
 
 /*********************************************************
@@ -43,7 +38,7 @@ exports.createPost = (req, res, next) => {
   const post = new Post({
     title: title,
     content: content,
-    imageUrl: "image/questions.JPG",
+    imageUrl: "images/questions.JPG",
     creator: { name: "Jonh test" },
   });
 
@@ -67,7 +62,18 @@ exports.getPostById = (req, res, next) => {
 
   //use the POST model to find the post
   Post.findById(postId)
-    .then()
+    .then((post) => {
+      //error handler
+      if (!post) {
+        const error = new Error("Feed post ID not found in the DB.");
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json({
+        message: "Feed post returned",
+        post: post,
+      });
+    })
     .catch((err) => catchErrorHandling(err));
 };
 
