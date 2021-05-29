@@ -23,4 +23,10 @@ router.post(
   feedController.createPost
 );
 
+/**
+ * /post/:postId -> GET -> 
+ * get a post with a id passed as a named URL segments (as a parameter)
+ */
+router.get('/post/:postId', feedController.getPostById);
+
 module.exports = router;
