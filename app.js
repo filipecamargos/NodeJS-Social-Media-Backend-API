@@ -1,7 +1,6 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const path = require('path');
+const path = require("path");
 
 //Import the config file
 const CONFIG = require("./private");
@@ -10,9 +9,9 @@ const feedRoutes = require("./routes/feed");
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 //Construct an absolut path to the image folder
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -27,16 +26,15 @@ app.use((req, res, next) => {
 //Registreed Routes
 app.use("/feed", feedRoutes);
 app.use((error, req, res, next) => {
-    console.log(error);
-    const status = error.statusCode || 500;
-    const message = error.message;
-    res.status(status).json({message: message});
+  console.log(error);
+  const status = error.statusCode || 500;
+  const message = error.message;
+  res.status(status).json({ message: message });
 });
-
 
 //Set the connection
 mongoose
-  .connect(CONFIG.db)
+  .connect(CONFIG.db, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
     app.listen(8080);
   })

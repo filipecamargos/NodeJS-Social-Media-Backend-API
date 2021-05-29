@@ -1,8 +1,10 @@
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const Post = require("../models/post");
 
-//GET POST
+/*********************************************************
+ * GET POST => Get all the post for the news feed
+ * ********************************************************/
 exports.getPosts = (req, res, next) => {
   res.status(200).json({
     posts: [
