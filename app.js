@@ -9,8 +9,10 @@ const feedRoutes = require("./routes/feed");
 
 const app = express();
 
+//register a body parser
 app.use(express.json());
-//Construct an absolut path to the image folder
+
+//Construct an static absolut path to the image folder _dirname gives access to the app path
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
@@ -25,6 +27,8 @@ app.use((req, res, next) => {
 
 //Registreed Routes
 app.use("/feed", feedRoutes);
+
+//Router error case
 app.use((error, req, res, next) => {
   console.log(error);
   const status = error.statusCode || 500;

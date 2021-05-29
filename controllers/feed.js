@@ -55,7 +55,7 @@ exports.createPost = (req, res, next) => {
       post: result
     });
   }).catch( err => {
-    //throw an error in case it occur in the DB
+    //throw an error in case it occur in the DB and hit the nex middleware
     if (!err.statusCode) {
       err.statusCode = 500;
     }
