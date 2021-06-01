@@ -13,7 +13,7 @@ const app = express();
 //Configure fall storage
 const uuidv4 = require('uuid/v4')
  
-const storage = multer.diskStorage({
+const FileStorage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'images');
     },
@@ -22,6 +22,18 @@ const storage = multer.diskStorage({
     }
 });
 
+//File filter
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+}
 
 //register a body parser
 app.use(express.json());
