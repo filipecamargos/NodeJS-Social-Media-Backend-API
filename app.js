@@ -10,6 +10,19 @@ const feedRoutes = require("./routes/feed");
 
 const app = express();
 
+//Configure fall storage
+const uuidv4 = require('uuid/v4')
+ 
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'images');
+    },
+    filename: function(req, file, cb) {
+        cb(null, uuidv4())
+    }
+});
+
+
 //register a body parser
 app.use(express.json());
 
