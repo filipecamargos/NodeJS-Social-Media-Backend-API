@@ -13,7 +13,7 @@ const app = express();
 //Configure fall storage
 const uuidv4 = require('uuid/v4')
  
-const FileStorage = multer.diskStorage({
+const fileStorage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'images');
     },
@@ -35,8 +35,11 @@ const fileFilter = (req, file, cb) => {
   }
 }
 
-//register a body parser
+//Register a body parser
 app.use(express.json());
+
+//Regsister the storage and filter coming from the image name as request
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
 
 //Construct an static absolut path to the image folder
 //_dirname gives access to the app path
