@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const multer = require("multer");
 
 //Import the config file
 const CONFIG = require("./private");
