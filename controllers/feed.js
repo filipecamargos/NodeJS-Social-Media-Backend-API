@@ -29,16 +29,22 @@ exports.createPost = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
+  if (!req.file) {
+    const error = new Error('No file provided!');
+    error.statusCode = 422;
+    throw error;
+  }
 
   //receive the values passed in the body
   const title = req.body.title;
   const content = req.body.content;
+  const imageUrl = req.file.path;
 
   //Create a Post Schema
   const post = new Post({
     title: title,
     content: content,
-    imageUrl: "images/questions.JPG",
+    imageUrl: imageUrl,
     creator: { name: "Jonh test" },
   });
 
