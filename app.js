@@ -10,8 +10,9 @@ const feedRoutes = require("./routes/feed");
 
 const app = express();
 
-//Configure fall storage
-const uuidv4 = require('uuid/v4')
+//Configure all for storage
+//const uuidv4 = require('uuid/v4')
+const { v4: uuidv4 } = require('uuid')
  
 const fileStorage = multer.diskStorage({
     destination: function(req, file, cb) {
