@@ -38,7 +38,7 @@ exports.createPost = (req, res, next) => {
   //receive the values passed in the body
   const title = req.body.title;
   const content = req.body.content;
-  const imageUrl = req.file.path;
+  const imageUrl = req.file.path.replace("\\" ,"/");
 
   //Create a Post Schema
   const post = new Post({
