@@ -32,6 +32,10 @@ router.get('/post/:postId', feedController.getPostById);
 /**
  * /post/:postId -> UPDATE -> Update a post based on id
  */
-router.put('/post/:postId');
+router.put('/post/:postId',  //validation array
+[
+  body("title").trim().isLength({ min: 5 }),
+  body("content").trim().isLength({ min: 5 }),
+], feedController.updatePost);
 
 module.exports = router;
