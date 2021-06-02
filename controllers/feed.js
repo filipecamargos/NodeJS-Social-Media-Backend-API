@@ -84,6 +84,28 @@ exports.getPostById = (req, res, next) => {
 };
 
 /************************************
+ * PUT -> Edit and Update the post feed
+ ************************************/
+exports.updatePost = (req, res, next) => {
+  //get the id
+  const postId = req.params.postId;
+  const title = req.body.title;
+  const content = req.body.content;
+  let imageUrl = req.body.image;
+
+  //check if got image got update
+  if (req.file) {
+    imageUrl = req.file.path.replace("\\","/");
+  }
+  if (!imageUrl) {
+    const error = new Error("No file selected!");
+    error.statusCode = 422;
+    throw error;
+  }
+
+};
+
+/************************************
  * Helping functions
  ************************************/
 const catchErrorHandling = (err) => {
