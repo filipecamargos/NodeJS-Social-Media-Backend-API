@@ -29,4 +29,9 @@ router.post(
  */
 router.get('/post/:postId', feedController.getPostById);
 
+/**
+ * /post/:postId -> UPDATE -> Update a post based on id
+ */
+router.put('/post/:postId');
+
 module.exports = router;
