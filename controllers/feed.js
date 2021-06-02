@@ -8,13 +8,14 @@ const Post = require("../models/post");
 exports.getPosts = (req, res, next) => {
   //fetch the feed post from the db
   Post.find()
-  .then(feedPosts => {
-    res.status(200).json({
-      message: (feedPosts.length < 1)  ? 'There are no posts!' : 'Feed Posts Returned.',
-      posts: feedPosts,
+    .then((feedPosts) => {
+      res.status(200).json({
+        message:
+          feedPosts.length < 1 ? "There are no posts!" : "Feed Posts Returned.",
+        posts: feedPosts,
+      });
     })
-  })
-  .catch();
+    .catch();
 };
 
 /*********************************************************
@@ -22,15 +23,10 @@ exports.getPosts = (req, res, next) => {
  * ********************************************************/
 exports.createPost = (req, res, next) => {
   //Check validation of the post
-  const errors = validationResult(req);
-  if (!errors.isEmpty) {
-    //Custom error message
-    const error = new Error("Invalid Post Method. Inconsistent Data!");
-    error.statusCode = 422;
-    throw error;
-  }
+  checkArrayOfErrors(req);
+
   if (!req.file) {
-    const error = new Error('No file provided!');
+    const error = new Error("No file provided!");
     error.statusCode = 422;
     throw error;
   }
@@ -38,7 +34,7 @@ exports.createPost = (req, res, next) => {
   //receive the values passed in the body
   const title = req.body.title;
   const content = req.body.content;
-  const imageUrl = req.file.path.replace("\\" ,"/");
+  const imageUrl = req.file.path.replace("\\", "/");
 
   //Create a Post Schema
   const post = new Post({
@@ -87,6 +83,9 @@ exports.getPostById = (req, res, next) => {
  * PUT -> Edit and Update the post feed
  ************************************/
 exports.updatePost = (req, res, next) => {
+  //check for error
+  checkArrayOfErrors(req);
+
   //get the id
   const postId = req.params.postId;
   const title = req.body.title;
@@ -95,23 +94,34 @@ exports.updatePost = (req, res, next) => {
 
   //check if got image got update
   if (req.file) {
-    imageUrl = req.file.path.replace("\\","/");
+    imageUrl = req.file.path.replace("\\", "/");
   }
   if (!imageUrl) {
     const error = new Error("No file selected!");
     error.statusCode = 422;
     throw error;
   }
-
 };
 
 /************************************
  * Helping functions
  ************************************/
+//Catch error handler
 const catchErrorHandling = (err) => {
   //throw an error in case it occur in the DB and hit the nex middleware
   if (!err.statusCode) {
     err.statusCode = 500;
   }
   next(err);
+};
+
+//Check for error
+const checkArrayOfErrors = (req) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty) {
+    //Custom error message
+    const error = new Error("Invalid Post Method. Inconsistent Data!");
+    error.statusCode = 422;
+    throw error;
+  }
 };
