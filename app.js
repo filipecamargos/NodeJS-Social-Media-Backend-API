@@ -11,7 +11,6 @@ const feedRoutes = require("./routes/feed");
 const app = express();
 
 //Configure all for storage
-//const uuidv4 = require('uuid/v4')
 const { v4: uuidv4 } = require('uuid')
  
 const fileStorage = multer.diskStorage({
