@@ -1,6 +1,10 @@
+const { clear } = require("console");
 const { validationResult } = require("express-validator");
+const fs = require("fs");
+const path = require("path");
 
 const Post = require("../models/post");
+const { post } = require("../routes/feed");
 
 /*********************************************************
  * GET the feed's posts => Get all the post for the news feed
@@ -66,11 +70,8 @@ exports.getPostById = (req, res, next) => {
   Post.findById(postId)
     .then((post) => {
       //error handler
-      if (!post) {
-        const error = new Error("Feed post ID not found in the DB.");
-        error.statusCode = 404;
-        throw error;
-      }
+      postFindErrorHandler(post);
+
       res.status(200).json({
         message: "Feed post returned",
         post: post,
@@ -101,6 +102,32 @@ exports.updatePost = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
+
+  //update in the DB
+  Post.findById(postId)
+    .then((post) => {
+      //if the post is not found
+      postFindErrorHandler(post);
+
+      //clear image
+      if (imageUrl !== post.imageUrl) {
+        clearImage(post.imageUrl);
+      }
+
+      //update
+      post.title = title;
+      post.imageUrl = imageUrl;
+      post.content = content;
+
+      return post.save();
+    })
+    .then((result) => {
+      res.status(200).json({
+        message: "Post updated",
+        post: result,
+      });
+    })
+    .catch((err) => catchErrorHandling(err));
 };
 
 /************************************
@@ -124,4 +151,19 @@ const checkArrayOfErrors = (req) => {
     error.statusCode = 422;
     throw error;
   }
+};
+
+//Post is check if found
+const postFindErrorHandler = (post) => {
+  if (!post) {
+    const error = new Error("Feed post ID not found in the DB.");
+    error.statusCode = 404;
+    throw error;
+  }
+};
+
+//clear image helper function
+const clearImage = (filePath) => {
+  filePath = path.join(__dirname, "..", filePath);
+  fs.unlink(filePath, (err) => console.log(err));
 };
