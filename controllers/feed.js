@@ -135,7 +135,6 @@ exports.updatePost = (req, res, next) => {
  ***************************************/
 exports.deletePost = (req, res, next) => {
   const postId = req.params.postId;
-  console.log("test")
 
   Post.findById(postId)
   .then(post => {
