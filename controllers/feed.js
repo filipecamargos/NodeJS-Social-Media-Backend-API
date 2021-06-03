@@ -134,7 +134,23 @@ exports.updatePost = (req, res, next) => {
  * DELETE -> Delete a feed post
  ***************************************/
 exports.deletePost = (req, res, next) => {
-  
+  const postId = req.params.postId;
+
+  Post.findById(postId)
+  .then(post => {
+    //verify if the post was found
+    postFindErrorHandler(post);
+
+    //clear the image for the post
+    clearImage(post.imageUrl);
+
+    //remove the post
+    Post.findByIdAndRemove(postId);
+
+  })
+  .then(result => {
+    res.status(200).json({message: 'Post deleted!'})
+  }).catch((err) => catchErrorHandling(err));
 };
 
 /************************************
