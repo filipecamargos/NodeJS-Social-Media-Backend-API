@@ -130,6 +130,13 @@ exports.updatePost = (req, res, next) => {
     .catch((err) => catchErrorHandling(err));
 };
 
+/**************************************
+ * DELETE -> Delete a feed post
+ ***************************************/
+exports.deletePost = (req, res, next) => {
+  
+};
+
 /************************************
  * Helping functions
  ************************************/

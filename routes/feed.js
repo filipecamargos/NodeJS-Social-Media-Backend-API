@@ -38,4 +38,9 @@ router.put('/post/:postId',  //validation array
   body("content").trim().isLength({ min: 5 }),
 ], feedController.updatePost);
 
+/**
+ * /post/:postId -> DELETE -> delete a post based on id
+ */
+router.delete('post/:postId', feedController.deletePost);
+
 module.exports = router;
