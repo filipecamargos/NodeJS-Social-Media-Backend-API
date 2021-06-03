@@ -10,16 +10,28 @@ const { post } = require("../routes/feed");
  * GET the feed's posts => Get all the post for the news feed
  * ********************************************************/
 exports.getPosts = (req, res, next) => {
-  //fetch the feed post from the db
+  //manage the pagination
+  const currentPage = req.query.page || 1;
+  const perPage = 2;
+  let totalItems;
+
   Post.find()
+    .countDocuments()
+    .then((count) => {
+      totalItems = count;
+
+      //fetch the feed post from the db
+      return Post.find().skip((currentPage - 1) * perPage);
+    })
     .then((feedPosts) => {
       res.status(200).json({
         message:
           feedPosts.length < 1 ? "There are no posts!" : "Feed Posts Returned.",
         posts: feedPosts,
+        totalItems: totalItems,
       });
     })
-    .catch();
+    .catch((err) => catchErrorHandling(err));
 };
 
 /*********************************************************
@@ -137,20 +149,20 @@ exports.deletePost = (req, res, next) => {
   const postId = req.params.postId;
 
   Post.findById(postId)
-  .then(post => {
-    //verify if the post was found
-    postFindErrorHandler(post);
+    .then((post) => {
+      //verify if the post was found
+      postFindErrorHandler(post);
 
-    //clear the image for the post
-    clearImage(post.imageUrl);
+      //clear the image for the post
+      clearImage(post.imageUrl);
 
-    //remove the post
-    return Post.findByIdAndRemove(postId);
-
-  })
-  .then(result => {
-    res.status(200).json({message: 'Post deleted!'})
-  }).catch((err) => catchErrorHandling(err));
+      //remove the post
+      return Post.findByIdAndRemove(postId);
+    })
+    .then((result) => {
+      res.status(200).json({ message: "Post deleted!" });
+    })
+    .catch((err) => catchErrorHandling(err));
 };
 
 /************************************
