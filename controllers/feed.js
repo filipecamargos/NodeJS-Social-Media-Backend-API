@@ -135,6 +135,7 @@ exports.updatePost = (req, res, next) => {
  ***************************************/
 exports.deletePost = (req, res, next) => {
   const postId = req.params.postId;
+  console.log("test")
 
   Post.findById(postId)
   .then(post => {
@@ -145,7 +146,7 @@ exports.deletePost = (req, res, next) => {
     clearImage(post.imageUrl);
 
     //remove the post
-    Post.findByIdAndRemove(postId);
+    return Post.findByIdAndRemove(postId);
 
   })
   .then(result => {
