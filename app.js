@@ -7,6 +7,7 @@ const multer = require("multer");
 const CONFIG = require("./private");
 
 const feedRoutes = require("./routes/feed");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
@@ -55,8 +56,9 @@ app.use((req, res, next) => {
   next();
 });
 
-//Registreed Routes
+//Registred Routes
 app.use("/feed", feedRoutes);
+app.use("/auth", authRoutes);
 
 //Router error case
 app.use((error, req, res, next) => {
