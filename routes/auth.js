@@ -29,4 +29,5 @@ router.put(
   authControler.signup
 );
 
-module.exports.router;
+module.exports = router;
+
