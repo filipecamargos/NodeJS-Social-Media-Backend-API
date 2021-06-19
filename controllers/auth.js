@@ -37,6 +37,33 @@ exports.signup = (req, res, next) => {
     .catch((error) => customErrorStatus("Error in the operation!", 500));
 };
 
+/**********************************************
+ * POST login the user
+ **********************************************/
+exports.login = (res, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadedUser; 
+
+  User.findOne({email: email})
+  .then(user => {
+    //check if it is a valid email
+    if (!user) {
+      customErrorStatus("Email not Found!", 401);
+    }
+    loadedUser = user;
+    return bcrypt.compare(password, user.password);
+  })
+  .then(isEqual => {
+    //check if it is a valid password
+    if (!isEqual) {
+      customErrorStatus("Wrong Email or Password!", 401);
+    }
+    //Generate a webToken
+  })
+  .catch((error) => customErrorStatus("Error in the operation!", 500));
+};
+
 /******************************************
  * All the Helping Functions will go below
  *****************************************/
