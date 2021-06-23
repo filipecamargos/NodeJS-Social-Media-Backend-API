@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken');
 
 const User = require("../models/user");
 
@@ -40,7 +41,7 @@ exports.signup = (req, res, next) => {
 /**********************************************
  * POST login the user
  **********************************************/
-exports.login = (res, res, next) => {
+exports.login = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   let loadedUser; 
@@ -60,6 +61,14 @@ exports.login = (res, res, next) => {
       customErrorStatus("Wrong Email or Password!", 401);
     }
     //Generate a webToken
+    const token = jwt.sign({
+      email: loadedUser.email,
+      userId: loadedUser._id.toString()
+    }, 'pageSecretForLoadingaToken', {expiresIn: '1h'});
+    res.status(200).json({
+      token: token,
+      userId: loadedUser._id.toString()
+    });
   })
   .catch((error) => customErrorStatus("Error in the operation!", 500));
 };

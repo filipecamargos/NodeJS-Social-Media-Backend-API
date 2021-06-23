@@ -32,7 +32,7 @@ router.put(
 /**
  * POST -> log the user in
  */
-router.post('/login');
+router.post('/login', authControler.login);
 
 module.exports = router;
 
