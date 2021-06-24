@@ -1,8 +1,17 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
+
+    //Check for the token
+    const authHeader = req.get('Authorization');
+    if(!authHeader) {
+        const error = new Error('Not Authenticated.')
+        error.statusCode = 401;
+        throw error;
+    }
+
     //get the toke that comes as "Bearer xxxxxxxxxxx"
-    const token = req.get('Authorization').split(' ')[1];
+    const token = authHeader.split(' ')[1];
 
     //Try to decode
     let decodedToken;
