@@ -16,6 +16,7 @@ router.get("/posts", isAuth, feedController.getPosts);
  */
 router.post(
   "/post",
+  isAuth,
   //validation array
   [
     body("title").trim().isLength({ min: 5 }),
@@ -28,12 +29,13 @@ router.post(
  * /post/:postId -> GET -> 
  * get a post with a id passed as a named URL segments (as a parameter)
  */
-router.get('/post/:postId', feedController.getPostById);
+router.get('/post/:postId', isAuth, feedController.getPostById);
 
 /**
  * /post/:postId -> UPDATE -> Update a post based on id
  */
-router.put('/post/:postId',  //validation array
+router.put('/post/:postId', isAuth,
+//validation array
 [
   body("title").trim().isLength({ min: 5 }),
   body("content").trim().isLength({ min: 5 }),
@@ -42,6 +44,6 @@ router.put('/post/:postId',  //validation array
 /**
  * /post/:postId -> DELETE -> delete a post based on id
  */
- router.delete('/post/:postId', feedController.deletePost);
+ router.delete('/post/:postId', isAuth, feedController.deletePost);
 
 module.exports = router;
