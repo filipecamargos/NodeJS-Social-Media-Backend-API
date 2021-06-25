@@ -8,29 +8,27 @@ const User = require("../models/user");
 /*********************************************************
  * GET the feed's posts => Get all the post for the news feed
  * ********************************************************/
-exports.getPosts = (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
   //manage the pagination
   const currentPage = req.query.page || 1;
   const perPage = 2;
   let totalItems;
 
-  Post.find()
-    .countDocuments()
-    .then((count) => {
-      totalItems = count;
-
-      //fetch the feed post from the db
-      return Post.find().skip((currentPage - 1) * perPage);
-    })
-    .then((feedPosts) => {
-      res.status(200).json({
-        message:
-          feedPosts.length < 1 ? "There are no posts!" : "Feed Posts Returned.",
-        posts: feedPosts,
-        totalItems: totalItems,
-      });
-    })
-    .catch((err) => catchErrorHandling(err));
+  try {
+    let count = await Post.find().countDocuments()
+    totalItems = count;
+  
+        //fetch the feed post from the db
+    let feedPosts = await Post.find().skip((currentPage - 1) * perPage);
+    res.status(200).json({
+      message:
+        feedPosts.length < 1 ? "There are no posts!" : "Feed Posts Returned.",
+      posts: feedPosts,
+      totalItems: totalItems,
+    });
+  } catch(err){
+    catchErrorHandling(err)
+  }
 };
 
 /*********************************************************
