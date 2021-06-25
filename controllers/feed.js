@@ -34,7 +34,7 @@ exports.getPosts = async (req, res, next) => {
 /*********************************************************
  * POST Feed Post => create a new social media post on the DB
  * ********************************************************/
-exports.createPost = (req, res, next) => {
+exports.createPost = async (req, res, next) => {
   //Check validation of the post
   checkArrayOfErrors(req);
 
@@ -48,7 +48,6 @@ exports.createPost = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
   const imageUrl = req.file.path.replace("\\", "/");
-  let creator;
 
   //Create a Post Schema
   const post = new Post({
@@ -59,62 +58,44 @@ exports.createPost = (req, res, next) => {
   });
 
   //Save in the DB and render the result
-  post
-    .save()
-    .then((result) => {
-      return User.findById(req.usserId);
+  try {
+    await post.save()
+    const user = await User.findById(req.userId);
+    user.posts.push(post);
+    await user.save();
+    res.status(201).json({
+      message: "Post created successfully!",
+      post: post,
+        creator: {_id: user.id, name: user.name}
     })
-    .then(user => {
-      creator = user;
-      user.posts.push(post);
-      return user.save();
-    })
-    .then(result => {
-      post.creator.name = "testdssds"
-      res.status(201).json({
-        message: "Post created successfully!",
-        post: post,
-        creator: {
-          id: creator._id,
-          name: {_id: creator.id, name: creator.name}
-        }
-      })
-    })
-    .catch((err) => catchErrorHandling(err));
+  } catch(err){ catchErrorHandling(err)};
 };
 
 /*********************************************************
  * GET a feed post => get it by id passed in the url
  * ********************************************************/
-exports.getPostById = (req, res, next) => {
+exports.getPostById = async (req, res, next) => {
   const postId = req.params.postId;
 
-  //use the POST model to find the post
-  Post.findById(postId)
-    .then((post) => {
-      //error handler
-      postFindErrorHandler(post);
+  try {
+    //use the POST model to find the post
+    let post = await Post.findById(postId)
+    //error handler
+    postFindErrorHandler(post);
 
-      res.status(200).json({
-        message: "Feed post returned",
-        post: post,
-      });
-    })
-    .catch((err) => catchErrorHandling(err));
+    res.status(200).json({
+      message: "Feed post returned",
+      post: post,
+    });
+  } catch(err){ catchErrorHandling(err)};
 };
 
 /************************************
  * PUT -> Edit and Update the post feed
  ************************************/
-exports.updatePost = (req, res, next) => {
+exports.updatePost = async (req, res, next) => {
   //check for error
   checkArrayOfErrors(req);
-
-  if(post.creator.toString() !== req.userId) {
-    const error = new Error("No authorized!");
-    error.statusCode = 404;
-    throw error;
-  }
 
   //get the id
   const postId = req.params.postId;
@@ -132,67 +113,68 @@ exports.updatePost = (req, res, next) => {
     throw error;
   }
 
-  //update in the DB
-  Post.findById(postId)
-    .then((post) => {
-      //if the post is not found
-      postFindErrorHandler(post);
+  try {
+    //update in the DB
+    let post = await Post.findById(postId)
 
-      //clear image
-      if (imageUrl !== post.imageUrl) {
-        clearImage(post.imageUrl);
-      }
+    if(post.creator.toString() !== req.userId) {
+      const error = new Error("No authorized!");
+      error.statusCode = 404;
+      throw error;
+    }
+    //if the post is not found
+    postFindErrorHandler(post);
 
-      //update
-      post.title = title;
-      post.imageUrl = imageUrl;
-      post.content = content;
+    //clear image
+    if (imageUrl !== post.imageUrl) {
+      clearImage(post.imageUrl);
+    }
 
-      return post.save();
-    })
-    .then((result) => {
-      res.status(200).json({
-        message: "Post updated",
-        post: result,
-      });
-    })
-    .catch((err) => catchErrorHandling(err));
+    //update
+    post.title = title;
+    post.imageUrl = imageUrl;
+    post.content = content;
+
+    let result = await post.save();
+    res.status(200).json({
+      message: "Post updated",
+      post: result,
+    });
+  } catch(err) {catchErrorHandling(err)};
 };
 
 /**************************************
  * DELETE -> Delete a feed post
  ***************************************/
-exports.deletePost = (req, res, next) => {
-  const postId = req.params.postId;
+exports.deletePost = async (req, res, next) => {
 
-  Post.findById(postId)
-    .then((post) => {
-      //verify if the post was found
-      postFindErrorHandler(post);
+  try {
+    const postId = req.params.postId;
 
-      if(post.creator.toString() !== req.userId) {
-        const error = new Error("No authorized!");
-        error.statusCode = 404;
-        throw error;
-      }
+    let post = await Post.findById(postId)
+  
+    //verify if the post was found
+    postFindErrorHandler(post);
+  
+    if(post.creator.toString() !== req.userId) {
+      const error = new Error("No authorized!");
+      error.statusCode = 404;
+      throw error;
+    }
+  
+    //clear the image for the post
+    clearImage(post.imageUrl);
 
-      //clear the image for the post
-      clearImage(post.imageUrl);
+    //remove the post
+    await Post.findByIdAndRemove(postId);
 
-      //remove the post
-      return Post.findByIdAndRemove(postId);
-    })
-    .then((result) => {
-      return User.findById(req.userId);
-    })
-    .then(user => {
-      user.posts.pull(postId);
-      return user.save();
-    })
-    .then(result => {
-      res.status(200).json({ message: "Post deleted!" });
-    })
-    .catch((err) => catchErrorHandling(err));
+    let user = await User.findById(req.userId);
+    user.posts.pull(postId);
+    await user.save();
+
+    res.status(200).json({ message: "Post deleted!" });
+
+  } catch(err){catchErrorHandling(err)};
 };
 
 /************************************
